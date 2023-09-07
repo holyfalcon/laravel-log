@@ -1,0 +1,51 @@
+version: "3"
+services:
+    php-app:
+        build:
+            context: ../../
+            dockerfile: deploy/docker/Dockerfile
+        image: log/log-api
+        container_name: log-php-app
+        restart: always
+        networks:
+            - log-api-net
+        volumes:
+            - ../../:/var/www/html/log
+        env_file:
+            -   ../../.env
+
+    nginx:
+        build:
+            context: ../../
+            dockerfile: deploy/docker/nginx/Dockerfile
+        image: log/log-nginx
+        container_name: log-nginx
+        ports:
+            - "${NGINX_PORT}:80"
+        volumes:
+            - ../../:/var/www/html/log
+        networks:
+            - log-api-net
+        restart: always
+
+    mysql:
+        image: mysql:8.0
+        container_name: log-mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=12345
+        volumes:
+            - mysql_data:/var/lib/mysql/log
+        ports:
+            - "${MYSQL_PORT}:3306"
+        networks:
+            - log-api-net
+        restart: always
+
+volumes:
+    mysql_data:
+        driver: local
+    redis_data:
+        driver: local
+
+networks:
+    log-api-net:
