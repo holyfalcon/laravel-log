@@ -1,6 +1,6 @@
 version: "3"
 services:
-    php-app:
+    log-app:
         build:
             context: ../../
             dockerfile: deploy/docker/Dockerfile
@@ -14,7 +14,7 @@ services:
         env_file:
             -   ../../.env
 
-    nginx:
+    log-nginx:
         build:
             context: ../../
             dockerfile: deploy/docker/nginx/Dockerfile
@@ -28,13 +28,13 @@ services:
             - log-api-net
         restart: always
 
-    mysql:
+    log-mysql:
         image: mysql:8.0
         container_name: log-mysql
         environment:
             - MYSQL_ROOT_PASSWORD=12345
         volumes:
-            - mysql_data:/var/lib/mysql/log
+            - mysql_log:/var/lib/mysql
         ports:
             - "${MYSQL_PORT}:3306"
         networks:
@@ -42,9 +42,7 @@ services:
         restart: always
 
 volumes:
-    mysql_data:
-        driver: local
-    redis_data:
+    mysql_log:
         driver: local
 
 networks:
